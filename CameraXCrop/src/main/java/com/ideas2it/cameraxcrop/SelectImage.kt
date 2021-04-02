@@ -15,7 +15,9 @@ class SelectImage(
     , val shouldCrop: Boolean?
 ) {
     class ActivityBuilder {
-
+        var mOptions = CropImageOptions()
+            private set
+        
         var shouldCrop: Boolean = false
             private set
 
@@ -31,7 +33,7 @@ class SelectImage(
         }
 
         fun start(activity: Activity) {
-            var mOptions = CropImageOptions()
+
             mOptions.cropShape = this.cropShape
 
             val intent = Intent(activity, CameraxActivity::class.java)
@@ -40,6 +42,12 @@ class SelectImage(
             bundle.putParcelable("cropShape", mOptions)
             intent.putExtra(CROP_IMAGE_EXTRA_BUNDLE, bundle)
             activity.startActivityForResult(intent, CROP_IMAGE_ACTIVITY_REQUEST_CODE)
+        }
+
+        fun setAspectRatio(aspectRatioX: Int, aspectRatioY: Int) = apply {
+            mOptions.aspectRatioX = aspectRatioX
+            mOptions.aspectRatioY = aspectRatioY
+            mOptions.fixAspectRatio = true
         }
     }
 }

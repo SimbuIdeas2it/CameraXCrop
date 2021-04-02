@@ -246,10 +246,22 @@ class CameraxActivity : AppCompatActivity() {
 
     }
     private fun launchImageCrop(uri: Uri){
+        var cropShape: CropImageView.CropShape = CropImageView.CropShape.RECTANGLE
+        var aspectRatioX = 1920
+        var aspectRatioY = 1080
+        if(mOptions?.aspectRatioX != null) {
+            aspectRatioX = mOptions?.aspectRatioX!!
+        }
+        if(mOptions?.aspectRatioY != null) {
+            aspectRatioY = mOptions?.aspectRatioY!!
+        }
+        if(mOptions?.cropShape != null) {
+            cropShape = mOptions?.cropShape!!
+        }
         CropImage.activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(1920, 1080)
-            .setCropShape(CropImageView.CropShape.RECTANGLE) // default is rectangle
+            .setAspectRatio(aspectRatioX, aspectRatioY)
+            .setCropShape(cropShape) // default is rectangle
             .start(this)
     }
 
