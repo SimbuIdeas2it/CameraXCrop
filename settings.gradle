@@ -1,0 +1,3 @@
+include ':CameraXCrop'
+include ':app'
+rootProject.name = "CameraXWithCrop"

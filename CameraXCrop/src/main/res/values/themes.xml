@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Theme.CameraXWithCrop.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.CameraXWithCrop.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.CameraXWithCrop.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
