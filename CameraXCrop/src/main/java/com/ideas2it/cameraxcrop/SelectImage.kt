@@ -26,7 +26,7 @@ class SelectImage(
             this.shouldCrop = shouldCrop
         }
 
-        fun setCropShape(cropShape: CropImageView.CropShape) {
+        fun setCropShape(cropShape: CropImageView.CropShape)  = apply {
             this.cropShape = cropShape
         }
 
