@@ -1,5 +1,17 @@
 # CameraXCrop
 
+Add a movn in project build.gradle
+
+```
+maven { url 'https://jitpack.io' }
+```
+
+Then add dependency on Module build.gradle
+
+```
+implementation 'com.github.SimbuIdeas2it:CameraXCrop:0.0.3'
+```
+
 To open a camerax librray using
 
 ``` kotlin
