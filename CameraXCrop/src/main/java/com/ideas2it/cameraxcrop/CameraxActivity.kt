@@ -23,6 +23,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_EXTRA_BUNDLE
+import com.theartofdev.edmodo.cropper.CropImageOptions
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.activity_camerax.*
 import java.io.ByteArrayOutputStream
@@ -39,7 +41,9 @@ class CameraxActivity : AppCompatActivity() {
 
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    var shouldCrop: Boolean = false
+    var shouldCrop: Boolean? = false
+    var mOptions: CropImageOptions? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camerax)
@@ -51,8 +55,9 @@ class CameraxActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-//        val bundle: Bundle? = intent.getBundleExtra(CROP_IMAGE_EXTRA_BUNDLE)
-//        shouldCrop = bundle?.getBoolean("crop", false)!!
+        val bundle: Bundle? = intent.getBundleExtra(CROP_IMAGE_EXTRA_BUNDLE)
+        shouldCrop = bundle?.getBoolean("crop", false)
+        mOptions = bundle?.getParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS)
 
         // Set up the listener for take photo button
         camera_capture_button.setOnClickListener { takePhoto() }
@@ -85,7 +90,17 @@ class CameraxActivity : AppCompatActivity() {
                     val savedUri = Uri.fromFile(photoFile)
                     val msg = "Photo capture succeeded: $savedUri"
                     Log.d(TAG, msg)
-                    launchImageCrop(savedUri)
+
+                    if(shouldCrop == true) {
+                        launchImageCrop(savedUri)
+                    }
+                    else {
+                        val intent = Intent()
+                        intent.putExtra("Uri", savedUri.toString())
+                        setResult(Activity.RESULT_OK,intent)
+                        finish()
+                    }
+
                 }
             })
     }
