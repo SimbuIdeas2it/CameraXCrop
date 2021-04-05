@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.ideas2it.cameraxcrop.CameraxActivity
-import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
 import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_EXTRA_BUNDLE
 import com.theartofdev.edmodo.cropper.CropImageOptions
@@ -18,14 +17,11 @@ class SelectImage(
     class ActivityBuilder {
         var mOptions = CropImageOptions()
             private set
-        
+
         var shouldCrop: Boolean = false
             private set
 
         var cropShape: CropImageView.CropShape = CropImageView.CropShape.RECTANGLE
-            private set
-
-        var filePath: String = ""
             private set
 
         fun crop(shouldCrop: Boolean) = apply{
@@ -43,8 +39,7 @@ class SelectImage(
             val intent = Intent(activity, CameraxActivity::class.java)
             val bundle = Bundle()
             bundle.putBoolean("crop", this.shouldCrop)
-            bundle.putString("path", this.filePath)
-            bundle.putParcelable(CropImage.CROP_IMAGE_EXTRA_OPTIONS, mOptions)
+            bundle.putParcelable("cropShape", mOptions)
             intent.putExtra(CROP_IMAGE_EXTRA_BUNDLE, bundle)
             activity.startActivityForResult(intent, CROP_IMAGE_ACTIVITY_REQUEST_CODE)
         }
@@ -53,10 +48,6 @@ class SelectImage(
             mOptions.aspectRatioX = aspectRatioX
             mOptions.aspectRatioY = aspectRatioY
             mOptions.fixAspectRatio = true
-        }
-
-        fun savePath(path: String) = apply {
-            this.filePath = path
         }
     }
 }
