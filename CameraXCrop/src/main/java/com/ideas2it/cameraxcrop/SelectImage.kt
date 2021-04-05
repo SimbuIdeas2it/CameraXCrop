@@ -4,7 +4,6 @@ package com.ideas2it.cameraxcrop
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.ideas2it.cameraxcrop.CameraxActivity
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
 import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_EXTRA_BUNDLE

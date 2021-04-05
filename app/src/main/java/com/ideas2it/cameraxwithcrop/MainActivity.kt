@@ -30,10 +30,10 @@ class MainActivity : AppCompatActivity() {
         val btn: Button = findViewById(R.id.capturebtn)
         btn.setOnClickListener {
             SelectImage.ActivityBuilder()
-                .crop(true)
+                .crop(false)
                 .setCropShape(CropImageView.CropShape.OVAL)
                 .setAspectRatio(600, 600)
-                .savePath("Simbu")
+                .savePath("////Simbu/////")
                 .start(this)
         }
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             if(imageExist) {
                 val type = getMimeType(tempUri.toString())
                 val format = Utils.getImageFormat(type!!)
-                CameraxActivity.saveImage(this, imgView, format, "Simbu1/Test")
+                CameraxActivity.saveImage(this, imgView, format, "/Simbu1/Test/")
             }
 
             else
@@ -71,14 +71,11 @@ class MainActivity : AppCompatActivity() {
                 val u = Uri.parse(uri)
                 tempUri = u
                 Glide.with(this).load(uri).into(imgView)
-//                imgView.setImageURI(u)
 
                 val ist: InputStream? = contentResolver.openInputStream(u)
                 val bitm: Bitmap = BitmapFactory.decodeStream(ist)
                 ist?.close()
                 imageExist = true
-
-
             }
         }
     }

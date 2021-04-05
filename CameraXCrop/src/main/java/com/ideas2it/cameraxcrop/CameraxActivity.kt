@@ -2,7 +2,6 @@ package com.ideas2it.cameraxcrop
 
 import android.Manifest
 import android.app.Activity
-import android.app.Application
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -16,10 +15,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.webkit.MimeTypeMap
-import android.widget.ImageView
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -32,9 +28,6 @@ import com.theartofdev.edmodo.cropper.CropImage.CROP_IMAGE_EXTRA_BUNDLE
 import com.theartofdev.edmodo.cropper.CropImageOptions
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.activity_camerax.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
@@ -72,9 +65,6 @@ class CameraxActivity : AppCompatActivity() {
         outputDirectory = getOutputDirectory()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        filePath = filePath?.replaceFirst("/*$", "")
-        filePath = filePath?.replaceFirst("*$/", "")
     }
 
     private fun takePhoto() {
@@ -107,7 +97,12 @@ class CameraxActivity : AppCompatActivity() {
                     }
                     else {
                         if(filePath != "") {
-//                            getImageProperty(savedUri)
+                            val type = getMimeType(savedUri.toString())
+                            val format = Utils.getImageFormat(type!!)
+                            val bitmap = getBitmapFromUri(savedUri)
+                            if(bitmap != null) {
+                                saveImage(this@CameraxActivity, bitmap, format, filePath!!)
+                            }
                         }
 
                         val intent = Intent()
@@ -179,8 +174,6 @@ class CameraxActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-    
-
     companion object {
         private const val TAG = "CameraXBasic"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
@@ -196,9 +189,7 @@ class CameraxActivity : AppCompatActivity() {
             }
         }
 
-        fun saveImage(context: Context, itemImage: View, format: Bitmap.CompressFormat, directory: String) {
-//        withContext(Dispatchers.IO) {
-            val bitmap = getBitmapFromView(itemImage)
+        fun saveImage(context: Context, bitmap: Bitmap, format: Bitmap.CompressFormat, directory: String) {
             val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
             var dirDest = File(Environment.DIRECTORY_PICTURES)
 
@@ -222,7 +213,6 @@ class CameraxActivity : AppCompatActivity() {
             }
 
             val newImageUri = context.contentResolver.insert(collection, newImage)
-
             context.contentResolver.openOutputStream(newImageUri!!, "w").use {
                 bitmap.compress(format, QUALITY, it)
             }
@@ -230,38 +220,12 @@ class CameraxActivity : AppCompatActivity() {
             newImage.clear()
             newImage.put(MediaStore.Images.Media.IS_PENDING, 0)
             context.contentResolver.update(newImageUri, newImage, null, null)
-//        }
         }
-//        fun saveImage(itemImage: View, activity: Activity) {
-//            val fileName: String
-//            val imageFromView = getBitmapFromView(itemImage)
-//
-//            ByteArrayOutputStream().apply {
-//                imageFromView.compress(Bitmap.CompressFormat.JPEG, 100, this)
-//                fileName = UUID.nameUUIDFromBytes(this.toByteArray()).toString().replace("-", "")
-//            }
-//
-//            val imageFile =  File("${activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)}/ChatOut/$fileName.jpg/")
-//
-//            if (!imageFile.exists()) {
-//
-//                val contentResolver = ContentValues().apply {
-//                    put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis())
-//                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-//                    put(MediaStore.Images.Media.DATA, imageFile.absolutePath)
-//                }
-//
-//                activity.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentResolver).apply {
-//                    imageFromView.compress(Bitmap.CompressFormat.JPEG, 100, activity.contentResolver.openOutputStream(this!!))
-//                }
-//
-//
-//                Toast.makeText(activity, "saved", Toast.LENGTH_SHORT).show()
-//            } else
-//                Toast.makeText(activity, "Already saved", Toast.LENGTH_SHORT).show()
-//        }
 
-
+        fun saveImage(context: Context, itemImage: View, format: Bitmap.CompressFormat, directory: String) {
+            val bitmap = getBitmapFromView(itemImage)
+            saveImage(context, bitmap, format, directory)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -289,7 +253,12 @@ class CameraxActivity : AppCompatActivity() {
                     val msg = "Photo capture succeeded: $result.uri"
 
                     if(filePath != "") {
-//                        getImageProperty(result.uri)
+                        val type = getMimeType(result.uri.toString())
+                        val format = Utils.getImageFormat(type!!)
+                        val bitmap = getBitmapFromUri(result.uri)
+                        if(bitmap != null) {
+                            saveImage(this@CameraxActivity, bitmap, format, filePath!!)
+                        }
                     }
 
                     val intent = Intent()
@@ -304,17 +273,31 @@ class CameraxActivity : AppCompatActivity() {
         }
 
     }
-    private fun launchImageCrop(uri: Uri){
+
+    fun getBitmapFromUri(uri: Uri): Bitmap? {
+        var bitmap: Bitmap? = null
+//        if(Build.VERSION.SDK_INT < 28) {
+//            bitmap = MediaStore.Images.Media.getBitmap(this@CameraxActivity.contentResolver, uri)
+//        }
+//        else {
+//            val source = ImageDecoder.createSource(this@CameraxActivity.contentResolver, uri)
+//            bitmap = ImageDecoder.decodeBitmap(source)
+//        }
+        bitmap = MediaStore.Images.Media.getBitmap(this@CameraxActivity.contentResolver, uri)
+        return bitmap
+    }
+
+    private fun launchImageCrop(uri: Uri) {
         var cropShape: CropImageView.CropShape = CropImageView.CropShape.RECTANGLE
         var aspectRatioX = 1920
         var aspectRatioY = 1080
-        if(mOptions?.aspectRatioX != null) {
+        if (mOptions?.aspectRatioX != null) {
             aspectRatioX = mOptions?.aspectRatioX!!
         }
-        if(mOptions?.aspectRatioY != null) {
+        if (mOptions?.aspectRatioY != null) {
             aspectRatioY = mOptions?.aspectRatioY!!
         }
-        if(mOptions?.cropShape != null) {
+        if (mOptions?.cropShape != null) {
             cropShape = mOptions?.cropShape!!
         }
         CropImage.activity(uri)
@@ -323,16 +306,6 @@ class CameraxActivity : AppCompatActivity() {
             .setCropShape(cropShape) // default is rectangle
             .start(this)
     }
-
-//    fun getImageProperty(uri: Uri) {
-//        val imgView = ImageView(this)
-//        imgView.setImageURI(uri)
-//        val type = getMimeType(uri.toString())
-//        val format = Utils.getImageFormat(type!!)
-//
-//        val bitmap: Bitmap = Glide.with(this).asBitmap().load(uri).centerCrop().into(-1, -1).get()
-////        saveImage(this, bitmap, format, filePath!!)
-//    }
 
     fun getMimeType(path: String): String {
         var type = "image/jpeg" // Default Value
