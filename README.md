@@ -24,7 +24,7 @@ SelectImage.ActivityBuilder()
                 .crop(false)
                 .setCropShape(CropImageView.CropShape.OVAL)
                 .setAspectRatio(600, 600)
-                .savePath("////Simbu/////")
+                .savePath("<Directory Path>")
                 .start(this)
 ```
 crop - true if the captured image wants to crop\
