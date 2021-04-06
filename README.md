@@ -9,15 +9,29 @@ maven { url 'https://jitpack.io' }
 Then add dependency on Module build.gradle
 
 ```
-implementation 'com.github.SimbuIdeas2it:CameraXCrop:0.0.3'
+implementation 'com.github.SimbuIdeas2it:CameraXCrop:0.0.7'
 ```
 
 To open a camerax librray using
-
+For com.github.SimbuIdeas2it:CameraXCrop:0.0.3
 ``` kotlin
 val intent = Intent(this, CameraxActivity::class.java)
 startActivityForResult(intent, 1)
 ```
+For com.github.SimbuIdeas2it:CameraXCrop:0.0.7
+```
+SelectImage.ActivityBuilder()
+                .crop(false)
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .setAspectRatio(600, 600)
+                .savePath("////Simbu/////")
+                .start(this)
+```
+crop - true if the captured image wants to crop\
+setCropShape - Shape of the crop image(OVAL or Rectangle)\
+savePath - If the image wants to save in internal memory in specific path.
+
+
 and get the response from camerax library using 
 
 ``` kotlin
@@ -31,9 +45,4 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
             }
         }
  }
-```
- 
-To save the image to external memory using the following lines from your activity
-``` kotlin
-CameraxActivity.saveImage(imgView, this)
 ```
